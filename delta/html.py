@@ -690,7 +690,7 @@ def render(delta, method='html', pretty=False, restrict_header=None):
     for line, attrs, index in delta.iter_lines():
         append_line(root, line, attrs, index)
         wcount = sum(map(lambda op: len(((strip_control_bytes(op.get('insert')) if isinstance(op.get('insert'), str) else '') or '').split(' ')), line.ops), wcount)
-        if restrict_header and wcount > 100 and not restrict_header_inserted:
+        if restrict_header and wcount > 50 and not restrict_header_inserted:
             restrict_header_inserted = True
             append_comment(root, Delta([{'insert': restrict_header}]))
 
