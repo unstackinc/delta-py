@@ -287,7 +287,7 @@ class Delta(object):
                 yield line, attributes, i
                 i += 1
                 if is_previous_newline:
-                    yield Delta([{'insert': None}]), attributes, i  # adds <br> tag
+                    yield Delta([{'insert': ''}]), attributes, i  # adds <br> tag
                     i += 1
                 line = Delta()
                 is_previous_newline = True
