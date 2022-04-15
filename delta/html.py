@@ -80,6 +80,13 @@ def add_class(element, *classes):
     return element
 
 
+class LinkBehavior:
+    POPUP = 'popup'
+    NEW_TAB = 'newTab'
+    CURRENT_TAB = 'currentTab'
+
+
+
 ### Registry ###
 class Format:
     all = []
@@ -258,11 +265,19 @@ def classes_check(op):
     return True
 
 
+def _open_new_tab(context: dict):
+    if 'behavior' in context:
+        if context['behavior'] == LinkBehavior.NEW_TAB:
+            return True
+    else:
+        return context.get('openNewTab')
+
+
 def create_hyperlink(root, href):
     if href:
         a = sub_element(root, 'a')
         a.attrib['href'] = href.get('url')
-        if href.get('openNewTab'):
+        if _open_new_tab(href):
             a.attrib['target'] = '_blank'
             a.attrib['rel'] = 'noopener noreferrer'
         return a
@@ -348,6 +363,7 @@ def base_image(root, op, tag, key):
 def image(root, op):
     return base_image(root, op, 'img', 'image')
 
+
 def base_video(root, op, tag, key):
     vid = op['insert'].get(key)
     container = sub_element(root, 'div')
@@ -358,7 +374,7 @@ def base_video(root, op, tag, key):
         el = sub_element(a, tag)
 
         a.attrib['href'] = href.get('url')
-        if href.get('openNewTab'):
+        if _open_new_tab(href):
             a.attrib['target'] = '_blank'
             a.attrib['rel'] = 'noopener noreferrer'
 
