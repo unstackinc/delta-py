@@ -267,8 +267,7 @@ def classes_check(op):
 
 def _open_new_tab(context: dict):
     if 'behavior' in context:
-        if context['behavior'] == LinkBehavior.NEW_TAB:
-            return True
+        return context['behavior'] == LinkBehavior.NEW_TAB
     else:
         return context.get('openNewTab')
 
