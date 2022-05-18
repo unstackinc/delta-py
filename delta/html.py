@@ -266,10 +266,7 @@ def classes_check(op):
 
 
 def _open_new_tab(context: dict):
-    if 'behavior' in context:
-        return context['behavior'] == LinkBehavior.NEW_TAB
-    else:
-        return context.get('openNewTab')
+    return context.get('behavior') == LinkBehavior.NEW_TAB
 
 
 def create_hyperlink(root, href):
