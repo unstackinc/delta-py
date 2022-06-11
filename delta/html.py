@@ -52,8 +52,8 @@ def sub_element(root, *a, **kwargs):
 def styled(element, styles):
     if element.tag != 'span':
         element = sub_element(element, 'span')
-    declare = parseStyle(element.attrib.get('style', ''))
     try:
+        declare = parseStyle(element.attrib.get('style', ''))
         for k, v in styles.items():
             declare.setProperty(k, v)
         element.attrib['style'] = declare.getCssText(' ')
