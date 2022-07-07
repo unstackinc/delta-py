@@ -228,16 +228,18 @@ def font(root, op):
 def link(root, op):
     if type(op['attributes']['link']) is dict:
         el = sub_element(root, 'a')
-        allowed_attrs = ['href', 'target']
-        for key in allowed_attrs:
-            value = op['attributes']['link'].get(key)
-            if value or type(value) is int:
-                el.attrib[key] = value
-                if key == 'target' and value == '_blank':
-                    el.attrib['rel'] = 'noopener'
+        href = op['attributes']['link'].get('href')
+        target = op['attributes']['link'].get('target')
+        el.attrib['href'] = href
+        # # No target linking for javascript links
+        if target and not href.startswith('javascript:'):
+            el.attrib['target'] = target
+            if target == '_blank':
+                el.attrib['rel'] = 'noopener'
     else:
         el = sub_element(root, 'a')
         el.attrib['href'] = op['attributes']['link']
+
     return el
 
 
