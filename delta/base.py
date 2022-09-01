@@ -286,7 +286,7 @@ class Delta(object):
                 attributes = iter.next(1).get('attributes', {})
                 yield line, attributes, i
                 i += 1
-                if is_previous_newline:
+                if is_previous_newline and not attributes.get('code-block'):
                     yield Delta([{'insert': ''}]), attributes, i  # adds <br> tag
                     i += 1
                 line = Delta()
