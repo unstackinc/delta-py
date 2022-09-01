@@ -284,7 +284,11 @@ class Delta(object):
                 is_previous_newline = False
             else:
                 attributes = iter.next(1).get('attributes', {})
-                yield line, attributes, i
+                if not line and attributes.get('code-block'):
+                    # Code block's <pre> html tag handles newline characters automatically
+                    yield Delta([{'insert': '\n'}]), attributes, i
+                else:
+                    yield line, attributes, i
                 i += 1
                 if is_previous_newline and not attributes.get('code-block'):
                     yield Delta([{'insert': ''}]), attributes, i  # adds <br> tag

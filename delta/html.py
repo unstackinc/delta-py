@@ -623,7 +623,7 @@ def blockquote(block, attrs):
 def code_block(root, op):
     root.tag = 'pre'
     root.attrib.update({
-        'class': root.attrib.get('class') + ' ' + CODE_BLOCK_CLASS
+        'class': root.attrib.get('class', '') + ' ' + CODE_BLOCK_CLASS
     })
     return root
 
