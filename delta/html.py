@@ -230,12 +230,30 @@ def link(root, op):
         el = sub_element(root, 'a')
         href = op['attributes']['link'].get('href')
         target = op['attributes']['link'].get('target')
-        el.attrib['href'] = href
+        smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
+        if not smart_url:
+            el.attrib['href'] = href
+
+        if smart_url:
+            link_attribs = op['attributes']['link'].get('link_attributes')
+
+            el.attrib['data-event'] = 'click'
+            el.attrib['data-section'] = str(link_attribs['section_id'])
+            el.attrib['data-category'] = 'text_action'
+            el.attrib['data-action'] = 'click'
+            el.attrib['data-behavior'] = target
+            el.attrib['data-product-popup'] = ''
+            el.attrib['data-product'] = smart_url[len('product:'):]
+            el.attrib['data-value'] = str(link_attribs['index'])
+
+            _script = sub_element(el, 'script')
+            _script.text = link_attribs['extra_script']
+
         # # No target linking for javascript links
-        if target and not href.startswith('javascript:'):
-            el.attrib['target'] = target
-            if target == '_blank':
-                el.attrib['rel'] = 'noopener'
+        if target == 'newTab' and not href.startswith('javascript:'):
+            el.attrib['target'] = '_blank'
+            el.attrib['rel'] = 'noopener'
+
     else:
         el = sub_element(root, 'a')
         el.attrib['href'] = op['attributes']['link']
