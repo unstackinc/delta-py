@@ -250,7 +250,7 @@ def link(root, op):
             _script.text = link_attribs['extra_script']
 
         # # No target linking for javascript links
-        if target == 'newTab' and not href.startswith('javascript:'):
+        if target in ('newTab', '_blank') and not href.startswith('javascript:'):
             el.attrib['target'] = '_blank'
             el.attrib['rel'] = 'noopener'
 
