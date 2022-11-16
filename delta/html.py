@@ -229,7 +229,7 @@ def link(root, op):
     if type(op['attributes']['link']) is dict:
         el = sub_element(root, 'a')
         href = op['attributes']['link'].get('href')
-        target = op['attributes']['link'].get('target')
+        behavior = op['attributes']['link'].get('behavior')
         smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
         if not smart_url:
             el.attrib['href'] = href
@@ -241,7 +241,7 @@ def link(root, op):
             el.attrib['data-section'] = str(link_attribs['section_id'])
             el.attrib['data-category'] = 'text_action'
             el.attrib['data-action'] = 'click'
-            el.attrib['data-behavior'] = target
+            el.attrib['data-behavior'] = behavior
             el.attrib['data-product-popup'] = ''
             el.attrib['data-product'] = smart_url[len('product:'):]
             el.attrib['data-value'] = str(link_attribs['index'])
@@ -249,8 +249,8 @@ def link(root, op):
             _script = sub_element(el, 'script')
             _script.text = link_attribs['extra_script']
 
-        # # No target linking for javascript links
-        if target in ('newTab', '_blank') and not href.startswith('javascript:'):
+        # No target linking for javascript links
+        if behavior in ('newTab', '_blank') and not href.startswith('javascript:'):
             el.attrib['target'] = '_blank'
             el.attrib['rel'] = 'noopener'
 
