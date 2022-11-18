@@ -231,10 +231,13 @@ def link(root, op):
         href = op['attributes']['link'].get('href')
         behavior = op['attributes']['link'].get('behavior')
         smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
-        if not smart_url:
+
+        current_or_new_tab = behavior in ('currentTab', 'newTab') and not smart_url
+
+        if current_or_new_tab:
             el.attrib['href'] = href
 
-        if smart_url:
+        if not current_or_new_tab:
             link_attribs = op['attributes']['link'].get('link_attributes')
 
             el.attrib['data-event'] = 'click'
