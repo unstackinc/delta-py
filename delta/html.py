@@ -232,7 +232,7 @@ def link(root, op):
         behavior = op['attributes']['link'].get('behavior')
         smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
 
-        current_or_new_tab = behavior in ('currentTab', 'newTab') and not smart_url
+        current_or_new_tab = behavior in ('currentTab', 'newTab')
 
         if current_or_new_tab:
             el.attrib['href'] = href
