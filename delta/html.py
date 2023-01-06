@@ -245,12 +245,21 @@ def link(root, op):
             el.attrib['data-category'] = 'text_action'
             el.attrib['data-action'] = 'click'
             el.attrib['data-behavior'] = behavior
-            el.attrib['data-product-popup'] = ''
-            el.attrib['data-product'] = smart_url[len('product:'):]
-            el.attrib['data-value'] = str(link_attribs['index'])
 
-            _script = sub_element(el, 'script')
-            _script.text = link_attribs['extra_script']
+            if smart_url.startswith('product:'):
+                el.attrib['data-product-popup'] = ''
+                el.attrib['data-product'] = smart_url[len('product:'):]
+                el.attrib['data-value'] = str(link_attribs['index'])
+
+                _script = sub_element(el, 'script')
+                _script.text = link_attribs['extra_script']
+
+            if smart_url.startswith('form:'):
+                el.attrib['data-unstack-form'] = ''
+                el.attrib['data-unstack-form-title'] = link_attribs['form_title']
+
+                form = html.fragment_fromstring(link_attribs['rendered_form'])
+                el.append(form)
 
         # No target linking for javascript links
         if behavior in ('newTab', '_blank') and not href.startswith('javascript:'):
