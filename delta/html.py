@@ -229,13 +229,43 @@ def link(root, op):
     if type(op['attributes']['link']) is dict:
         el = sub_element(root, 'a')
         href = op['attributes']['link'].get('href')
-        target = op['attributes']['link'].get('target')
-        el.attrib['href'] = href
-        # # No target linking for javascript links
-        if target and not href.startswith('javascript:'):
-            el.attrib['target'] = target
-            if target == '_blank':
-                el.attrib['rel'] = 'noopener'
+        behavior = op['attributes']['link'].get('behavior')
+        smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
+
+        current_or_new_tab = behavior in ('currentTab', 'newTab')
+
+        if current_or_new_tab:
+            el.attrib['href'] = href
+
+        if not current_or_new_tab:
+            link_attribs = op['attributes']['link'].get('link_attributes')
+
+            el.attrib['data-event'] = 'click'
+            el.attrib['data-section'] = str(link_attribs['section_id'])
+            el.attrib['data-category'] = 'text_action'
+            el.attrib['data-action'] = 'click'
+            el.attrib['data-behavior'] = behavior
+
+            if smart_url.startswith('product:'):
+                el.attrib['data-product-popup'] = ''
+                el.attrib['data-product'] = smart_url[len('product:'):]
+                el.attrib['data-value'] = str(link_attribs['index'])
+
+                _script = sub_element(el, 'script')
+                _script.text = link_attribs['extra_script']
+
+            if smart_url.startswith('form:'):
+                el.attrib['data-unstack-form'] = ''
+                el.attrib['data-unstack-form-title'] = link_attribs['form_title']
+
+                form = html.fragment_fromstring(link_attribs['rendered_form'])
+                el.append(form)
+
+        # No target linking for javascript links
+        if behavior in ('newTab', '_blank') and not href.startswith('javascript:'):
+            el.attrib['target'] = '_blank'
+            el.attrib['rel'] = 'noopener'
+
     else:
         el = sub_element(root, 'a')
         el.attrib['href'] = op['attributes']['link']
