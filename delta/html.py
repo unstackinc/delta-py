@@ -100,10 +100,13 @@ class Format:
     def __call__(self, root, op):
         if self._check(op):
             try:
-                el =  self.fn(root, op)
+                el = self.fn(root, op)
             except Exception as e:
                 logger.exception('Rendering format failed: %r', e)
-                el = ''
+                el = sub_element(root, 'span')
+                el.attrib['class'] = 'error'
+                el.attrib['data-quill-error'] = str(e)
+                el.attrib['style'] = 'display:none'
             return el
         return root
 
@@ -228,9 +231,10 @@ def font(root, op):
 def link(root, op):
     if type(op['attributes']['link']) is dict:
         el = sub_element(root, 'a')
-        href = op['attributes']['link'].get('href')
-        behavior = op['attributes']['link'].get('behavior')
-        smart_url = op.get('attributes', {}).get('link', {}).get('smart_url')
+        link = op.get('attributes', {}).get('link', {})
+        href = link.get('href')
+        behavior = link.get('behavior')
+        smart_url = link.get('smart_url')
 
         current_or_new_tab = behavior in ('currentTab', 'newTab')
 
@@ -238,27 +242,27 @@ def link(root, op):
             el.attrib['href'] = href
 
         if not current_or_new_tab:
-            link_attribs = op['attributes']['link'].get('link_attributes')
+            link_attribs = link.get('link_attributes', {})
 
             el.attrib['data-event'] = 'click'
-            el.attrib['data-section'] = str(link_attribs['section_id'])
+            el.attrib['data-section'] = str(link_attribs.get('section_id', ''))
             el.attrib['data-category'] = 'text_action'
             el.attrib['data-action'] = 'click'
             el.attrib['data-behavior'] = behavior
 
-            if smart_url.startswith('product:'):
+            if smart_url and smart_url.startswith('product:'):
                 el.attrib['data-product-popup'] = ''
                 el.attrib['data-product'] = smart_url[len('product:'):]
-                el.attrib['data-value'] = str(link_attribs['index'])
+                el.attrib['data-value'] = str(link_attribs.get('index', ''))
 
                 _script = sub_element(el, 'script')
-                _script.text = link_attribs['extra_script']
+                _script.text = link_attribs.get('extra_script', '')
 
-            if smart_url.startswith('form:'):
+            if smart_url and smart_url.startswith('form:'):
                 el.attrib['data-unstack-form'] = ''
-                el.attrib['data-unstack-form-title'] = link_attribs['form_title']
+                el.attrib['data-unstack-form-title'] = link_attribs.get('form_title', '')
 
-                form = html.fragment_fromstring(link_attribs['rendered_form'])
+                form = html.fragment_fromstring(link_attribs.get('rendered_form', ''))
                 el.append(form)
 
         # No target linking for javascript links
@@ -689,7 +693,7 @@ def append_line(root, delta, attrs, index):
     block = None
     if attrs.get('header') == 2 and not attrs.get('id-attribute'):
         attrs['id-attribute'] = re.sub(
-            '\s+', '_',re.sub('^[^a-zA-Z\s]*|[^a-zA-Z0-9\s]', '', delta.document())
+            r'\s+', '_',re.sub(r'^[^a-zA-Z\s]*|[^a-zA-Z0-9\s]', '', delta.document())
         ).lower()
     for op in delta.ops:
         if isinstance(op.get('insert'), dict) and ('image' in op['insert'] or 'picture' in op['insert'] or 'divider' in op['insert']):
