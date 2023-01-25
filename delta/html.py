@@ -676,7 +676,8 @@ def append_op(root, op):
 
     text = op.get('insert')
     if isinstance(text, str) and text:
-        if list(root):
+        smart_url = ((op.get('attributes') or {}).get('link') or {}).get('smart_url') or ''
+        if list(root) and (not smart_url or not smart_url.startswith('form:')):
             last = root[-1]
             if last.tail:
                 last.tail += text
