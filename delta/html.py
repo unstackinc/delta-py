@@ -233,7 +233,7 @@ def link(root, op):
         el = sub_element(root, 'a')
         link = op.get('attributes', {}).get('link', {})
         href = link.get('href')
-        behavior = link.get('behavior')
+        behavior = link.get('behavior') or 'currentTab'
         smart_url = link.get('smart_url')
 
         current_or_new_tab = behavior in ('currentTab', 'newTab')
