@@ -231,6 +231,10 @@ def font(root, op):
 def link(root, op):
     if type(op['attributes']['link']) is dict:
         el = sub_element(root, 'a')
+
+        if root.tag == 'span' and 'color' in root.attrib.get('style', ''):
+            el.attrib['style'] = 'color: inherit;'
+
         link = op.get('attributes', {}).get('link', {})
         href = link.get('href')
         behavior = link.get('behavior') or 'currentTab'
