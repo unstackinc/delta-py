@@ -364,11 +364,7 @@ def picture(root, op):
 
     def _create_img_tag(img_root, src_key):
         img_tag = sub_element(img_root, 'img')
-        base_src = raw_sources[-1]['srcset'][0]
-        img_tag.attrib[src_key] = base_src['src'] if raw_sources else None
-        for attr in ('width', 'height'):
-            if base_src[attr] is not None:
-                img_tag.attrib[attr] = str(base_src[attr])
+        img_tag.attrib[src_key] = raw_sources[-1]['srcset'][0]['src'] if raw_sources else None
         set_img_attrs(img_tag, attributes)
 
     if lazy_load:
