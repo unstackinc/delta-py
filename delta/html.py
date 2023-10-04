@@ -229,7 +229,7 @@ def font(root, op):
 
 @format
 def link(root, op):
-    if type(op['attributes']['link']) is dict:
+    if isinstance(op['attributes']['link'], dict):
         el = sub_element(root, 'a')
 
         if root.tag == 'span' and 'color' in root.attrib.get('style', ''):
