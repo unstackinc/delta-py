@@ -245,27 +245,28 @@ def link(root, op):
         if current_or_new_tab:
             el.attrib['href'] = href
 
-        if not current_or_new_tab:
+        if not current_or_new_tab or smart_url.startswith('coupon:'):
             link_attribs = link.get('link_attributes', {})
 
             el.attrib['data-event'] = 'click'
             el.attrib['data-section'] = str(link_attribs.get('section_id', ''))
             el.attrib['data-category'] = 'text_action'
             el.attrib['data-action'] = 'click'
+
+            if link_attribs.get('extra_attrs'):
+                extra_attrs = html.fragment_fromstring(f'<a {link_attribs["extra_attrs"]}/>').attrib
+                for key, value in extra_attrs.items():
+                    el.attrib[key] = value
+
             el.attrib['data-behavior'] = behavior
 
             if smart_url and smart_url.startswith('product:'):
-                el.attrib['data-product-popup'] = ''
-                el.attrib['data-product'] = smart_url[len('product:'):]
                 el.attrib['data-value'] = str(link_attribs.get('index', ''))
 
                 _script = sub_element(el, 'script')
                 _script.text = link_attribs.get('extra_script', '')
 
             if smart_url and smart_url.startswith('form:'):
-                el.attrib['data-unstack-form'] = ''
-                el.attrib['data-unstack-form-title'] = link_attribs.get('form_title', '')
-
                 form = html.fragment_fromstring(link_attribs.get('rendered_form', ''))
                 el.append(form)
 
