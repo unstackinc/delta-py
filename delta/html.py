@@ -1,15 +1,17 @@
 import logging
 import re
 from functools import wraps
+
+import cssutils
+
 from .base import Delta
 from lxml.html import HtmlElement, Element
 from lxml import html
-from cssutils import parseStyle
 
-# This handles the error caused by css2.1 validator on rem units
-from cssutils import profile
-profile._MACROS['positivelength'] = r'0|{positivenum}(em|ex|px|in|cm|mm|pt|pc|rem)'
-profile._resetProperties()
+
+# disable error reporting as browsers are now working with css level 3 or 4
+# whereas this package is using outdated version and logging unnecessary errors
+cssutils.log.setLog(logging.FATAL)
 
 CLASSES = {
     'font': {
@@ -53,7 +55,7 @@ def styled(element, styles):
     if element.tag != 'span':
         element = sub_element(element, 'span')
     try:
-        declare = parseStyle(element.attrib.get('style', ''))
+        declare = cssutils.parseStyle(element.attrib.get('style', ''))
         for k, v in styles.items():
             declare.setProperty(k, v)
         element.attrib['style'] = declare.getCssText(' ')
