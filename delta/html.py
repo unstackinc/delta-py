@@ -247,7 +247,10 @@ def link(root, op):
         if current_or_new_tab:
             el.attrib['href'] = href
 
-        if not current_or_new_tab or smart_url and smart_url.lower().startswith('coupon:'):
+        if (
+            not current_or_new_tab
+            or (smart_url and (smart_url.lower().startswith('coupon:') or smart_url.lower().startswith('cart:')))
+        ):
             link_attribs = link.get('link_attributes', {})
 
             el.attrib['data-event'] = 'click'
