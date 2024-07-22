@@ -10,7 +10,7 @@ setup(
     author_email='brantley@forge.works',
     packages=['delta'],
     license="MIT License",
-    install_requires=['diff-match-patch', 'lxml', 'cssutils'],
+    install_requires=['diff-match-patch', 'lxml', 'tinycss2'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     project_urls={  # Optional
