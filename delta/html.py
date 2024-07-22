@@ -1,17 +1,10 @@
 import logging
 import re
-from functools import wraps
-
-import cssutils
+import tinycss2
 
 from .base import Delta
-from lxml.html import HtmlElement, Element
 from lxml import html
 
-
-# disable error reporting as browsers are now working with css level 3 or 4
-# whereas this package is using outdated version and logging unnecessary errors
-cssutils.log.setLog(logging.FATAL)
 
 CLASSES = {
     'font': {
@@ -51,17 +44,14 @@ def sub_element(root, *a, **kwargs):
     return e
 
 
-def styled(element, styles):
+def styled(element, styles: str):
     if element.tag != 'span':
         element = sub_element(element, 'span')
-    try:
-        declare = cssutils.parseStyle(element.attrib.get('style', ''))
-        for k, v in styles.items():
-            declare.setProperty(k, v)
-        element.attrib['style'] = declare.getCssText(' ')
-    except:
-        # Ignore invalid CSS attributes
-        pass
+    rules = [
+        *tinycss2.parse_blocks_contents(element.attrib.get('style', '')),
+        *tinycss2.parse_blocks_contents(styles)
+    ]
+    element.attrib['style'] = tinycss2.serialize(rules)
     return element
 
 
@@ -212,21 +202,22 @@ def script(root, op):
 
 @format
 def background(root, op):
-    return styled(root, {'background-color': op['attributes']['background']})
+    return styled(root, f'background-color: {op['attributes']['background']}')
 
 
 @format
 def color(root, op):
-    return styled(root, {'color': op['attributes']['color']})
+    return styled(root, f'color: {op['attributes']['color']}')
 
 
 @format
 def size(root, op):
-    return styled(root, {'font-size': op['attributes']['size']})
+    return styled(root, f'font-size: {op['attributes']['size']}')
+
 
 @format
 def font(root, op):
-    return styled(root, {'font-family': op['attributes']['font']})
+    return styled(root, f'font-family: {op['attributes']['font']}')
 
 
 @format
