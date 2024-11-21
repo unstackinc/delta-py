@@ -384,11 +384,17 @@ def base_image(root, op, tag, key):
     img = op['insert'].get(key)
     figure = sub_element(root, 'figure')
 
-    a = create_hyperlink(figure, img.get('link'))
+    if isinstance(img, dict):
+        a = create_hyperlink(figure, img.get('link'))
 
-    el = sub_element(a if a is not None else figure, tag)
-    el.attrib['src'] = img.get('src')
-    set_img_attrs(img_tag=el, attrs=img)
+        el = sub_element(a if a is not None else figure, tag)
+        el.attrib['src'] = img.get('src')
+        set_img_attrs(img_tag=el, attrs=img)
+    elif isinstance(img, str):
+        el = sub_element(figure, tag)
+        el.attrib['src'] = img
+    else:
+        raise TypeError(f'Invalid type of img: {type(img)}')
     return figure
 
 
