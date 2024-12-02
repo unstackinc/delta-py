@@ -676,6 +676,27 @@ def id_attribute(root, op):
     })
 
 
+def valid_xml_char_ordinal(c):
+    codepoint = ord(c)
+    # conditions ordered by presumed frequency
+    return (
+        codepoint in (0x9, 0xA, 0xD) or
+        0x20 <= codepoint <= 0xD7FF or
+        0xE000 <= codepoint <= 0xFFFD or
+        0x10000 <= codepoint <= 0x10FFFF
+        )
+
+
+def append_text(_to, text):
+    try:
+        if _to:
+            _to += text
+        else:
+            _to = text
+    except ValueError:
+        text = ''.join(c for c in text if valid_xml_char_ordinal(c))
+        append_text(_to, text)
+
 ### Processors ###
 def append_op(root, op):
     for fmt in Format.all:
@@ -687,15 +708,9 @@ def append_op(root, op):
         smart_url = smart_url if isinstance(smart_url, str) else (smart_url.get('smart_url') or '')
         if list(root) and (not smart_url or not smart_url.startswith('form:')):
             last = root[-1]
-            if last.tail:
-                last.tail += text
-            else:
-                last.tail = text
+            append_text(last.tail, text)
         else:
-            if root.text:
-                root.text += text
-            else:
-                root.text = text
+            append_text(root.text, text)
 
 
 def append_line(root, delta, attrs, index):
